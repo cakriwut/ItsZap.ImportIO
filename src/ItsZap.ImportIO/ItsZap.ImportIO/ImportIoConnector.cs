@@ -26,5 +26,14 @@ namespace ItsZap.ImportIO
 
             return Execute(request);
         }
+
+        public Task<string> ExecuteSearchAsync(string query)
+        {
+            var request = new RestRequest(ResourceSearch);
+            request.AddQueryParameter("q", query);
+
+            return ExecuteAsync(request);
+
+        }
     }
 }
