@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="ImportIoApi.cs" />
     <Compile Include="ImportIoConnector.cs" />
+    <Compile Include="ImportIoMagic.cs" />
     <Compile Include="ImportIoQuery.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
