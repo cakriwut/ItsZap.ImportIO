@@ -23,12 +23,12 @@ namespace ItsZap.ImportIO
             ConnectorID = connectorId;
         }
 
-        public string GetResult(string input)  
+        public string ExecuteQuery(string input)  
         {
-            return GetResult(input, null);
+            return ExecuteQuery(input, null);
         }
 
-        public string GetResult(string input,string page)  
+        public string ExecuteQuery(string input,string page)  
         {
             var request = new RestRequest(Resource);
             request.AddParameter("connectorId", ConnectorID, ParameterType.UrlSegment);
@@ -42,5 +42,15 @@ namespace ItsZap.ImportIO
             return Execute(request);
         }
 
+        public Task<string> ExecuteQueryAsync(string input)
+        {
+            var request = new RestRequest(Resource);
+            request.AddParameter("connectorId", ConnectorID, ParameterType.UrlSegment);
+
+            if (!String.IsNullOrEmpty(input))
+                request.AddQueryParameter("input", input);
+
+            return ExecuteAsync(request);
+        }
     }
 }

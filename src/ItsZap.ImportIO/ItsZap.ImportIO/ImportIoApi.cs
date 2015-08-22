@@ -21,16 +21,21 @@ namespace ItsZap.ImportIO
             _appKey = appKey;
         }
 
-        public string Execute(RestRequest request) 
+        private RestClient CreateClient(RestRequest request)
         {
             var client = new RestClient();
             client.BaseUrl = new Uri(BaseUrl);
-           
 
             request.AddQueryParameter("_user", _userId);
             request.AddQueryParameter("_apikey", _appKey);
 
-            var response = client.Execute  (request);
+            return client;
+        }
+        protected string Execute(RestRequest request) 
+        {
+            var client = CreateClient(request);
+
+            var response = client.Execute(request);
             if (response.ErrorException != null)
             {
                 throw new ApplicationException(
@@ -39,15 +44,11 @@ namespace ItsZap.ImportIO
             return response.Content;
         }
 
-        public Task<string> ExecuteAsync(RestRequest request) 
+        protected Task<string> ExecuteAsync(RestRequest request) 
         {
             var tcs = new TaskCompletionSource<string>();
 
-            var client = new RestClient();
-            client.BaseUrl = new Uri(BaseUrl);
-
-            request.AddQueryParameter("_user", _userId);
-            request.AddQueryParameter("_apikey", _appKey);
+            var client = CreateClient(request);
 
             client.ExecuteAsync(request, response => {
                 if(response.ErrorException != null)
@@ -57,6 +58,40 @@ namespace ItsZap.ImportIO
                 } else
                 {
                     tcs.SetResult(response.Content);
+                }
+            });
+
+            return tcs.Task;
+        }
+
+        protected T Execute<T>(RestRequest request) where T :new()
+        {
+            var client = CreateClient(request);
+
+            var response = client.Execute<T>(request);
+            if (response.ErrorException != null)
+            {
+                throw new ApplicationException(
+                    "Error in request", response.ErrorException);
+            }
+            return response.Data;
+        }
+
+        protected Task<T> ExecuteAsync<T>(RestRequest request)  where T :new()
+        {
+            var tcs = new TaskCompletionSource<T>();
+
+            var client = CreateClient(request);
+
+            client.ExecuteAsync<T>(request, response => {
+                if (response.ErrorException != null)
+                {
+                    tcs.SetException(new ApplicationException(
+                        "Error in request", response.ErrorException));
+                }
+                else
+                {
+                    tcs.SetResult(response.Data);
                 }
             });
 
